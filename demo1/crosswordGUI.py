@@ -12,18 +12,16 @@ class CrosswordGUI:
 
         # initialize Tkinter window
         self.window = Tk()
-
+        # set window title and background
+        self.window.title( "The Mini Crossword")
+        self.window.configure( bg = 'white')
         # set window icon
         self.window.call( 'wm', 'iconphoto', self.window._w, PhotoImage( file = 'icon.png'))
 
-        # set window title
-        self.window.title( "The Mini Crossword")
-
-        self.draw_title()
         self.draw_grid( self.data['cells'])
         self.draw_clues( self.data['clues'])
-
         print( "CrosswordGUI: Crossword puzzle created.")
+
         # open window
         self.window.resizable(False, False)
         self.window.mainloop()
@@ -31,30 +29,14 @@ class CrosswordGUI:
         print( "CrosswordGUI: Program terminated.")
 
 
-    def draw_title( self):
-        title_frame = Frame( master = self.window)
-        title_frame.pack( fill = X, padx = 10, pady = 10)
-        # title
-        title_label = Label( master = title_frame,
-                            text = "The Mini Crossword",
-                            font = "Times 40 bold",
-                            padx = 10)
-        title_label.grid( column = 0, row = 0, sticky = S)
-        # date of the day
-        date_label = Label( master = title_frame,
-                            text = datetime.now().strftime('%A, %B %e, %Y'),
-                            font ='Arial 26')
-        date_label.grid( column = 1, row = 0, ipady = 3.5, sticky = S)
-
-
     def draw_grid( self, cells):
         def update_time():
             info_label.configure( text = datetime.now().strftime( "%d/%m/%Y %H:%M:%S")
-                                    + ", ARTILLEGENCE")
+                                    + " ARTILLIGENCE")
             self.window.after( 1000, update_time)
 
         GRID_MARGIN = 10
-        SQUARE_WIDTH = 100
+        SQUARE_WIDTH = 80
 
         font_size_number = SQUARE_WIDTH // 5
         font_number = ( "Arial", font_size_number)
@@ -62,12 +44,14 @@ class CrosswordGUI:
         font_letter = ( "Arial", font_size_letter)
 
         # general frame of grid
-        grid_frame = Frame( master = self.window)
+        grid_frame = Frame( master = self.window, bg = 'white')
         grid_frame.pack( fill = BOTH, side = LEFT, padx = 10, pady = 10)
 
         canvas = Canvas( master = grid_frame,
                         width = SQUARE_WIDTH * self.CROSSWORD_SIZE + 2 * GRID_MARGIN,
-                        height = SQUARE_WIDTH * self.CROSSWORD_SIZE + 2 * GRID_MARGIN)
+                        height = SQUARE_WIDTH * self.CROSSWORD_SIZE + 2 * GRID_MARGIN,
+                        highlightthickness = 0,
+                        bg = 'white')
         canvas.pack( fill = BOTH, side = TOP)
 
         for i in range( self.CROSSWORD_SIZE):
@@ -104,7 +88,7 @@ class CrosswordGUI:
 
         # date and time
         info_label = Label( master = grid_frame, text = "",
-                            font = "Arial 12", anchor = E)
+                            font = "Arial 12", anchor = E, bg = 'white')
         info_label.pack( fill = BOTH, side = BOTTOM, padx = 10)
         update_time()
 
@@ -114,47 +98,61 @@ class CrosswordGUI:
         font_clue = "Arial 14"
 
         # general frame of clues
-        clue_frame = Frame( master = self.window)
+        clue_frame = Frame( master = self.window, bg = 'white')
         clue_frame.pack( fill = Y, side = TOP, padx = 10, pady = 10)
 
         # frame of across clues
-        across_frame = Frame( master = clue_frame)
+        across_frame = Frame( master = clue_frame, bg = 'white')
         across_frame.grid( column = 0, row = 0, ipadx = 10, sticky = NW)
 
         # across clues title
         across_label = Label( master = across_frame,
                             text = "ACROSS",
                             font = font_title,
-                            anchor = W)
+                            anchor = W,
+                            bg = 'white')
         across_label.pack( fill = X, padx = 10, pady = 10)
+
+        across_clues = Text( master = across_frame,
+                            font = font_clue,
+                            wrap = 'word',
+                            width = 25,
+                            height = 17,
+                            relief = FLAT,
+                            highlightthickness = 0)
+        across_clues.tag_configure( 'bulleted', lmargin1 = 0, lmargin2 = 20)
+
         # across clues
         for clue in clues['across']:
             text = clue['id'] + ". " + clue['text']
-            across_label = Label( master = across_frame,
-                                text = text,
-                                font = font_clue,
-                                anchor = W,
-                                justify = LEFT,
-                                wraplength = 300)
-            across_label.pack( fill = X, pady = 5)
+            across_clues.insert( 'end', text + "\n\n", 'bulleted')
+            across_clues.pack( fill = X, pady = 5)
+        across_clues.configure( state = DISABLED)
 
         # frame of down clues
-        down_frame = Frame( clue_frame)
+        down_frame = Frame( master = clue_frame, bg = 'white')
         down_frame.grid( column = 1, row = 0, ipadx = 10, sticky = NW)
 
         # down clue title
         down_label = Label( master = down_frame,
                             text = "DOWN",
                             font = font_title,
-                            anchor = W)
+                            anchor = W,
+                            bg = 'white')
         down_label.pack( fill = X, padx = 10, pady = 10)
+
+        down_clues = Text( master = down_frame,
+                            font = font_clue,
+                            wrap = 'word',
+                            width = 25,
+                            height = 17,
+                            relief = FLAT,
+                            highlightthickness = 0)
+        down_clues.tag_configure( 'bulleted', lmargin1 = 0, lmargin2 = 20)
+
         # down clues
         for clue in clues['down']:
             text = clue['id'] + ". " + clue['text']
-            down_label = Label( master = down_frame,
-                                text = text,
-                                font = font_clue,
-                                anchor = W,
-                                justify = LEFT,
-                                wraplength = 300)
-            down_label.pack( fill = X, pady = 5)
+            down_clues.insert( 'end', text + "\n\n", 'bulleted')
+            down_clues.pack( fill = X, pady = 5)
+        down_clues.configure( state = DISABLED)
