@@ -7,9 +7,7 @@ class CrosswordGUI:
         CROSSWORD_SIZE = 7
         print( "It's saturday!")
 
-    def __init__( self, retData):
-        self.data = retData
-
+    def __init__( self, retData, solvedData):
         # initialize Tkinter window
         self.window = Tk()
         # set window title and background
@@ -18,8 +16,9 @@ class CrosswordGUI:
         # set window icon
         self.window.call( 'wm', 'iconphoto', self.window._w, PhotoImage( file = 'icon.png'))
 
-        self.draw_grid( self.data['cells'])
-        self.draw_clues( self.data['clues'])
+        self.draw_grid( retData['cells'], False)
+        self.draw_clues( retData['clues'])
+        self.draw_grid( solvedData['cells'], True)
         print( "CrosswordGUI: Crossword puzzle created.")
 
         # open window
@@ -29,7 +28,7 @@ class CrosswordGUI:
         print( "CrosswordGUI: Program terminated.")
 
 
-    def draw_grid( self, cells):
+    def draw_grid( self, cells, bum):
         def update_time():
             info_label.configure( text = datetime.now().strftime( "%d/%m/%Y %H:%M:%S")
                                     + " ARTILLIGENCE")
@@ -42,6 +41,10 @@ class CrosswordGUI:
         font_number = ( "Arial", font_size_number)
         font_size_letter = 2 * SQUARE_WIDTH // 3
         font_letter = ( "Arial", font_size_letter)
+        if bum:
+            font_color = 'black'
+        else:
+            font_color = '#232ed6'
 
         # general frame of grid
         grid_frame = Frame( master = self.window, bg = 'white')
@@ -77,7 +80,7 @@ class CrosswordGUI:
                 y2 = y1 + (3 * SQUARE_WIDTH // 5)
                 canvas.create_text( x2, y2,
                                     text = cell_data['text'].upper(),
-                                    font = font_letter, fill = '#232ed6')
+                                    font = font_letter, fill = font_color)
 
                 # write number if any
                 x2 = x1 + (font_size_number // 2)
@@ -87,10 +90,11 @@ class CrosswordGUI:
                                     font = font_number)
 
         # date and time
-        info_label = Label( master = grid_frame, text = "",
-                            font = "Arial 12", anchor = E, bg = 'white')
-        info_label.pack( fill = BOTH, side = BOTTOM, padx = 10)
-        update_time()
+        if bum:
+            info_label = Label( master = grid_frame, text = "",
+                                font = "Arial 16", anchor = E, bg = 'white')
+            info_label.pack( fill = BOTH, side = BOTTOM, padx = 10)
+            update_time()
 
 
     def draw_clues( self, clues):
@@ -99,7 +103,7 @@ class CrosswordGUI:
 
         # general frame of clues
         clue_frame = Frame( master = self.window, bg = 'white')
-        clue_frame.pack( fill = Y, side = TOP, padx = 10, pady = 10)
+        clue_frame.pack( fill = Y, side = LEFT, padx = 10, pady = 10)
 
         # frame of across clues
         across_frame = Frame( master = clue_frame, bg = 'white')
